@@ -27,10 +27,10 @@ public class TipDialog extends DialogFragment {
 
     ImageView imageView;
 
-    public static TipDialog newInstance(String type) {
+    public static TipDialog newInstance(int type) {
 
         Bundle args = new Bundle();
-        args.putString(TYPE_KEY, type);
+        args.getInt(TYPE_KEY, type);
         TipDialog fragment = new TipDialog();
         fragment.setArguments(args);
         return fragment;

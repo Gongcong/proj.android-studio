@@ -25,6 +25,7 @@ package org.cocos2dx.javascript;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -69,6 +70,7 @@ public class AppActivity extends Cocos2dxActivity implements StatusListener, Wor
     public static final String COCOS_GET_SENSOR_TABLE = "COCOS_GET_SENSOR_TABLE";
     public static final String COCOS_SET_SENSOR_TABLE = "COCOS_SET_SENSOR_TABLE";
     public static final String COCOS_SHOW_DIALOG = "COCOS_SHOW_DIALOG";
+    public static final String COCOS_GET_INDEX = "COCOS_GET_INDEX";
 
     public static final String TAG = AppActivity.class.getSimpleName();
 
@@ -83,6 +85,8 @@ public class AppActivity extends Cocos2dxActivity implements StatusListener, Wor
 
     private String gameName;
     private String obbPath;
+
+    DialogFragment dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +117,7 @@ public class AppActivity extends Cocos2dxActivity implements StatusListener, Wor
                 }
             }
         });
-        Utils.getResPath("gong");
+        //Utils.getResPath("gong");
     }
 
     @Override
@@ -217,14 +221,20 @@ public class AppActivity extends Cocos2dxActivity implements StatusListener, Wor
                     //instance.showTipDialog();
                     int show = jo.getInt("show");
                     String type = jo.getString("state");
-                    instance.showTipDialog(type, show);
+                    //instance.showTipDialog(type, show);
                     break;
+                case COCOS_GET_INDEX:
+                    int indexType = jo.getInt("indexType");
+                    int indexResult = instance.serviceBinder.getIndex(indexType);
+                    JSONObject indexJo = new JSONObject();
+                    indexJo.put("index", indexResult);
+                    return wrapResult(result, 0, indexJo.toString());
             }
         } catch (ServiceNotConnectException | JSONException e) {
             e.printStackTrace();
             result = -1;
         }
-        return wrapResult(result, 0,"");
+        return wrapResult(result, 0, "");
     }
 
     public void notifyJs(final String cmd, final String content) {
@@ -380,9 +390,7 @@ public class AppActivity extends Cocos2dxActivity implements StatusListener, Wor
         return jo.toString();
     }
 
-    DialogFragment dialog;
-
-    public void showTipDialog(String type, int open) {
+    public void showTipDialog(int type, int open) {
         dialog = (DialogFragment) getFragmentManager().findFragmentByTag("dialog");
         if (dialog != null) {
             if (open == 1) {
